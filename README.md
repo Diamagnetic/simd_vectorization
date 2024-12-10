@@ -3,7 +3,7 @@ Demonstration of speed-up using SIMD vectorization in C compiled using GCC compi
 
 
 ## How to use?
-Best works on Unix-like systems. Have a GCC compiler installed.
+Works best on Unix-like systems. Have a GCC compiler installed.
 
 To test the speed-up:
  * Compile the program with O1 flag to compile without
