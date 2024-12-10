@@ -10,8 +10,8 @@
  * 
  * Best works on Unix-like systems
  * To test the speed-up:
- * 1. Compile the program with O1 flag to compile without
- * any optimizations
+ * 1. Compile the program with O0 flag to compile without
+ * any compiler optimizations
  * 2. Run the binary and timings will be shown
  * 3. Compile the program with O2 flag or above (max O4) to compile with
  * SIMD vectorization options turned on.
