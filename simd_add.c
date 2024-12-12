@@ -18,7 +18,7 @@
  *******************************************************/
 
 #define N (10000000U)
-#define SM (CLS / sizeof (double))
+#define SM (CLS / sizeof (unsigned int))
 // max vector register size = 128
 #define STRIDE (128 / sizeof(unsigned int))
 
