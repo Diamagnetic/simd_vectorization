@@ -33,14 +33,14 @@ double mul2[N][N] __attribute__ ((aligned (64)));
 
 int main (void)
 {
-  printf("Cache Line size:%d\n\n", CLS);
+  printf("Cache Line size:%d\n%ld\n", CLS, SM);
 
 	double start, end;
 
 	GET_TIME(start);
   for(unsigned int i = 0; i < N; i++)
     for(unsigned int j = 0; j < N; j++)
-      mul1[i][j] = i * N + j;
+      mul1[i][j] = 1;
 
   GET_TIME(end);
   printf("Intialized Matrix A\nTime taken = %e seconds\n",
@@ -49,7 +49,7 @@ int main (void)
   GET_TIME(start);
   for(unsigned int i = 0; i < N; i++)
     for(unsigned int j = 0; j < N; j++)
-      mul2[i][j] = i * N + j;
+      mul2[i][j] = 1;
   GET_TIME(end);
   printf("\nIntialized Matrix B\nTime taken = %e seconds\n",
       (end - start));
@@ -73,6 +73,10 @@ int main (void)
   double *rmul1;
   double *rmul2;
 
+  for(i = 0; i < N; i++)
+    for(j = 0; j < N; j++)
+      res[i][j] = 0;
+ 
   // Matrix Multiplication with SIMD optimization
   // Multiply, add, and store SM values at a time
   GET_TIME(start);
@@ -83,23 +87,32 @@ int main (void)
             i2 < SM;
             ++i2, rres += N, rmul1 += N)
         {
+          // load one line of cache
           _mm_prefetch (&rmul1[8], _MM_HINT_NTA);
           for (k2 = 0, rmul2 = &mul2[k][j]; k2 < SM; ++k2, rmul2 += N)
           {
+            // load two double values and set upper value as 0	
             __m128d m1d = _mm_load_sd (&rmul1[k2]);
+            // save same values in both registers, return the stored value
             m1d = _mm_unpacklo_pd (m1d, m1d);
             for (j2 = 0; j2 < SM; j2 += 2)
             {
+              // load two double values
               __m128d m2 = _mm_load_pd (&rmul2[j2]);
+              // load two double values
               __m128d r2 = _mm_load_pd (&rres[j2]);
+              //store the result
               _mm_store_pd (&rres[j2],
+              // multiply and add
                   _mm_add_pd (_mm_mul_pd (m2, m1d), r2));
             }
           }
         }
   GET_TIME(end);
   printf("\nSIMD Vectorization\nMatrix A * Matrix B\nTime taken = %e seconds\n",
-			(end - start));
+        (end - start));
+
+  printf("%f\n", res[0][0]);
 
   return 0;
 }
